@@ -17,39 +17,38 @@ let currentUser = '';
 //let emailteste='arturf123ss@gmail.com';
 
 
+let emailstodos="aaa";
 const email = localStorage.getItem("users");
 const users = JSON.parse(email);
 console.log(users[0].email);
-
-
 let emaillogado=users[0].email;
+let emailteste=users[0].email;
 
-const params = new URLSearchParams(window.location.search);
 
-// Extrair os valores
-
-const email2 = params.get("email");
-
-//let emailteste=users[0].email;
-
-let emailteste=email2;
 
 //let emaillogado='arturf123ss@gmail.com';
 //let emailteste='arturf123ss@gmail.com';
+
 function loadSendMessageButton() {
     const container = document.getElementById('sendMessageButtonContainer');
-    if (emaillogado !== emailteste) {
-        const button = document.createElement('button');
-        button.className = 'sendmessagebutton';
-        button.textContent = 'mandar primeira mensagem';
-       // mudarCorDeFundo();
-        button.onclick = () => sendmessagebutton(emailteste);
-        container.appendChild(button);
-    }
+    
+    const button = document.createElement('button');
+    button.className = 'sendmessagebutton';
+    button.textContent = 'Alterar Tema';
+
+    // Cores iniciais
+    let coratual = '#f0f2f5'; // Cor clara
+    let proximacor = '#323538'; // Cor escura
+
+    button.onclick = () => mudarCorDeFundo(coratual, proximacor);
+
+    container.appendChild(button);
 }
-function mudarCorDeFundo2(cor1, cor2) {
-   // console.log("bbbb");
-    // Obtém a cor atual do fundo no formato RGB
+
+function mudarCorDeFundo(cor1, cor2) {
+    //profileName
+    let nam=document.getElementById('profileName');
+   // nam.style.color = 'white'; 
     const backgroundColor = getComputedStyle(document.body).backgroundColor;
 
     // Converter cores hexadecimais para RGB
@@ -61,53 +60,55 @@ function mudarCorDeFundo2(cor1, cor2) {
         return `rgb(${r}, ${g}, ${b})`;
     };
 
-    // Converte as cores para RGB
     const cor1Rgb = hexToRgb(cor1);
     const cor2Rgb = hexToRgb(cor2);
 
-    // Verifica a cor atual e alterna entre cor1 e cor2
     if (backgroundColor === cor1Rgb) {
         document.body.style.backgroundColor = cor2;
+        nam.style.color = 'white'; 
     } else if (backgroundColor === cor2Rgb) {
+        nam.style.color = 'black'; 
         document.body.style.backgroundColor = cor1;
     } else {
         // Define uma cor padrão caso o fundo não esteja configurado
         document.body.style.backgroundColor = cor1;
     }
 }
-function loadcollor() {
-    const container1 = document.getElementById('color');
- 
-        const button1 = document.createElement('button');
-        button1.className = 'sendmessagebutton2';
-        button1.textContent = 'TEMA';
-       // mudarCorDeFundo();
-       let coratual= '#f0f2f5';
-       let proximacor='#323538';
-      // console.log("aaaa");
-       button1.addEventListener('click', () => {
-        //console.log('Botão clicado! Chamando mudarCorDeFundo.');
-        mudarCorDeFundo2(coratual, proximacor);
-    });
-     
-        container1.appendChild(button1);
-   
-}
-
-
 // Chama a função após carregar a página
 document.addEventListener('DOMContentLoaded', () => {
     loadSendMessageButton();
-    loadcollor();
 });
 
-function mudarCorDeFundo() {
-    document.body.style.backgroundColor = color;
+
+function performSearch() {
+const query = document.getElementById('searchInput').value;
+
+// Verifica se o campo não está vazio
+if (!query.trim()) {
+alert('Por favor, insira algo para pesquisar.');
+return;
 }
+
+document.getElementById('searchInput').value = "";
+
+// Procura o email correspondente
+const matchedEmail = emailstodos.find(emailObj => emailObj.email === query);
+
+if (matchedEmail) {
+setTimeout(() => {
+   // window.location.href = `index.html?email=${encodeURIComponent(email)}&background=${encodeURIComponent(backgroundColor)}`;
+    window.location.href = `index.html?email=${encodeURIComponent(query)}`;
+}, 1000);
+} else {
+alert('Email não encontrado!');
+}
+}
+
+
 
 function loadProfile(email) {
 
-fetch(`http://localhost:3000/get-profile/${emailteste}`)
+fetch(`http://localhost:3000/get-profile/${email}`)
 .then(response => response.json())
 .then(user => {
     const profileButton = document.getElementById('profileButton');
@@ -125,24 +126,12 @@ fetch(`http://localhost:3000/get-profile/${emailteste}`)
     }
 })
 .catch(error => console.error('Erro ao carregar perfil:', error));
-const nomeemail = document.getElementById('nomedeperfil');
-nomeemail.innerText=email;
+
+
 
 }
 function loadUserToLocalStorage(email) {
-fetch(`http://localhost:3000/get-user/${emailteste}`) // Substitua pelo email do usuário
-.then(response => {
-    if (!response.ok) {
-        throw new Error(`Erro ao carregar dados: ${response.statusText}`);
-    }
-    return response.json();
-})
-.then(userData => {
-    // Salva os dados do usuário no LocalStorage
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-    console.log('Dados do usuário carregados para o LocalStorage:', userData);
-})
-.catch(error => console.error('Erro ao carregar dados para o LocalStorage:', error));
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -151,183 +140,125 @@ loadUserToLocalStorage(userEmail);
 });
 
 function updateLocalStorage(email) {
-/*
-fetch(`http://localhost:3000/get-user/${email}`)
-.then(response => {
-    if (!response.ok) {
-        throw new Error(`Erro ao atualizar LocalStorage: ${response.statusText}`);
-    }
-    return response.json();
-})
-.then(userData => {
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-    console.log('LocalStorage atualizado:', userData);
-})
-.catch(error => console.error('Erro ao sincronizar LocalStorage:', error));
-*/
 
 }
 
 
-function updateProfilePhoto(email) {
-if (emaillogado !== emailteste) {
-       return;
-    } 
-const input = document.createElement('input');
-input.type = 'file';
-input.accept = 'image/*';
+function updateProfilePhoto(emaillogado) {
 
-input.onchange = function () {
-const file = input.files[0];
-if (file) {
-    const formData = new FormData();
-    formData.append('file', file);
-   // 'arturf123ss@gmail.com'
-    // Envia a nova foto para o backend
-    fetch('http://localhost:3000/upload', {
-        method: 'POST',
-        body: formData,
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Erro ao fazer upload: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const novaFoto = data.filePath;
 
-            // Atualiza o campo "foto" no JSON do usuário
-            return fetch('http://localhost:3000/update-profile-photo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, foto: novaFoto }),
-            });
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Erro ao atualizar foto de perfil: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(result => {
-            alert(result.message || "Foto de perfil atualizada com sucesso!");
-            loadProfile(email); // Recarrega o perfil para exibir a nova foto
-        })
-        .catch(error => console.error('Erro ao atualizar foto de perfil:', error));
-}
-};
-
-input.click();
+    setTimeout(() => {
+        //window.location.href = `index.html?email=${encodeURIComponent(email)}&background=${encodeURIComponent(backgroundColor)}`;
+window.location.href = `index.html?email=${encodeURIComponent(emaillogado)}`;
+}, 1000);
 updateLocalStorage(email);  // Abre o seletor de arquivos
 }
-function loadArtes(email) {
-    fetch(`http://localhost:3000/get-artes/${emailteste}`)
-        .then(response => response.json())
-        .then(artes => {
-            const feed = document.getElementById('feed');
-            feed.innerHTML = '';
 
 
-            artes.reverse();
-            artes.forEach((arte, index) => {
-                const originalIndex = artes.length - 1 - index;
-                const photoContainer = document.createElement('div');
-                photoContainer.classList.add('photo-container');
 
-                const img = document.createElement('img');
-                img.src = `http://localhost:3000${arte.arte}`;
-                img.classList.add('photo');
-                img.alt = "Arte do usuário";
 
-                const actions = document.createElement('div');
-                actions.classList.add('photo-actions');
-                console.log('Artes carregadas:', arte.curtidas);
 
-                let result = extractBetweenHyphenAndDot(arte.arte);
+function loadallArtes() {
+  // mudarCorDeFundo();
+    let oo=0;
+fetch(`http://localhost:3000/get-all-artes`)
+.then(response => response.json())
+.then(artes => {
+    const feed = document.getElementById('feed');
+    feed.innerHTML = ''; // Limpa o feed antes de carregar
+
+    // Ordena as artes pela ordem inversa
+    artes.reverse();
+    emailstodos=artes;
+    console.log("Artes carregadas:", emailstodos);
+    // Itera sobre todas as artes para criar os elementos do feed
+    artes.forEach((arte, index) => {
+      
+        if (!arte.arte || arte.arte.trim() === '') {
+            
+            oo=oo+1;
+            return; // Pula para a próxima iteração
+        }
+       
+const originalIndex = artes.length - 1 - index; 
+index=index-oo;
+let index22=arte.indexa;
+console.log("original", originalIndex);
+console.log("index", index);
+        // Contêiner para a arte
+        const photoContainer = document.createElement('div');
+        photoContainer.classList.add('photo-container');
+
+        // Imagem da arte
+        const img = document.createElement('img');
+        img.src = `http://localhost:3000${arte.arte}`;
+        img.classList.add('photo');
+        img.alt = `Arte do usuário ${arte.email}`;
+
+        // Ações (curtir e comentar)
+        const actions = document.createElement('div');
+        actions.classList.add('photo-actions');
+        let result = extractBetweenHyphenAndDot(arte.arte);
                 console.log(result.length);
 if (result.length===0) {
 
 result=arte.arte;
 }
-if (arte.curtidas===undefined) {
-arte.curtidas=0;
-}
-                actions.innerHTML = `
+        actions.innerHTML = `
+            <span class="photo-action" onclick="likePhoto(${originalIndex}, '${arte.email}', '${arte.email}','${index}','${index22}')">
+                👍 Curtir <span id="likes-count-${originalIndex}">${arte.curtidas}</span>
+            </span>
+            <span class="photo-action" onclick="toggleComments(${index})">💬 Comentar</span>
+            <span class="aa" value='${arte.name}'>nome:${result}</span>
+           <button class="aa" value="${arte.name}" onclick="gotoemail('${arte.email}')">${arte.email}</button>
 
-<span class="photo-action" onclick="likePhoto(${originalIndex}, '${email}', '${email}')">
+            <button class="aac"' onclick="doarpara('${arte.email}')">$$</span>
+        `;
 
-👍 Curtir <span id="likes-count-${originalIndex}">${arte.curtidas}</span>
-</span>
+        // Comentários
+        const commentsSection = document.createElement('div');
+        commentsSection.classList.add('comments-section');
+        commentsSection.style.display = 'none';
+        commentsSection.id = `comments-section-${index}`;
 
-<span class="photo-action" onclick="toggleComments(${index})">💬 Comentar</span>
+        // Adiciona os comentários existentes
+        arte.comentarios.forEach(comment => {
+            const commentDiv = document.createElement('div');
+            commentDiv.classList.add('comment');
+            commentDiv.innerHTML = `
+                <span class="comment-user">${comment.usuario}:</span>
+                <span class="comment-text">${comment.texto}</span>
+            `;
+            commentsSection.appendChild(commentDiv);
+        });
 
-${emaillogado === emailteste ? 
-`<span class="photo-action" onclick="removePhoto(${originalIndex}, '${email}')">💬 Remover</span>` : 
-''}
+        // Campo para novo comentário
+        const newCommentDiv = document.createElement('div');
+        newCommentDiv.classList.add('new-comment');
+        newCommentDiv.innerHTML = `
+            <input type="text" id="new-comment-input-${index}" placeholder="Escreva um comentário...">
+            <button onclick="addComment(${index}, '${arte.email}', '${originalIndex}', '${index22}')">Enviar</button>
+        `;
+        commentsSection.appendChild(newCommentDiv);
 
-<span class="aa" value='${arte.name}'>nome: ${result}</span>
-
-${emaillogado !== emailteste ? 
-`<button class="aac"' onclick="doarpara('${email}')">$$</span>` : 
-''}
-`;
-                
-            
-
-
-                const commentsSection = document.createElement('div');
-                commentsSection.classList.add('comments-section');
-                commentsSection.style.display = 'none';
-                commentsSection.id = `comments-section-${index}`;
-
-                arte.comentarios.forEach(comment => {
-                    const commentDiv = document.createElement('div');
-                    commentDiv.classList.add('comment');
-                    commentDiv.innerHTML = `
-                        <span class="comment-user">${comment.usuario}:</span>
-                        <span class="comment-text">${comment.texto}</span>
-                    `;
-                    commentsSection.appendChild(commentDiv);
-                });
-
-                const newCommentDiv = document.createElement('div');
-                newCommentDiv.classList.add('new-comment');
-                newCommentDiv.innerHTML = `
-                    <input type="text" id="new-comment-input-${index}" placeholder="Escreva um comentário...">
-                    <button onclick="addComment(${index}, '${email}', '${originalIndex}')">Enviar</button>
-                `;
-                commentsSection.appendChild(newCommentDiv);
-
-                photoContainer.appendChild(img);
-                photoContainer.appendChild(actions);
-                photoContainer.appendChild(commentsSection);
-                feed.appendChild(photoContainer);
-            });
-        })
-        .catch(error => console.error('Erro ao carregar artes:', error));
-        updateLocalStorage(email); 
+        // Adiciona tudo ao contêiner principal
+        photoContainer.appendChild(img);
+        photoContainer.appendChild(actions);
+        photoContainer.appendChild(commentsSection);
+        feed.appendChild(photoContainer);
+    });
+})
+.catch(error => console.error('Erro ao carregar artes:', error));
 }
 
+function gotoemail(email){
+setTimeout(() => {
+    //window.location.href = `index.html?email=${encodeURIComponent(email)}&background=${encodeURIComponent(backgroundColor)}`;
+    window.location.href = `index.html?email=${encodeURIComponent(email)}`;
+}, 1000);
 
-function extractBetweenHyphenAndDot(inputString) {
-// Encontra a posição do último '-' na string
-const hyphenIndex = inputString.lastIndexOf('-');
-// Encontra a posição do primeiro '.' após o '-'
-const dotIndex = inputString.indexOf('.', hyphenIndex);
-
-// Se ambos os índices forem válidos, extrai a substring
-if (hyphenIndex !== -1 && dotIndex !== -1) {
-return inputString.substring(hyphenIndex + 1, dotIndex);
 }
-
-// Retorna uma string vazia se não encontrar o padrão esperado
-return '';
-}
-
-
 function doarpara(email) {
-    console.log(email);
 const donationValue = prompt("Digite o valor da doação:");
 
 // Valida o valor da doação
@@ -360,10 +291,27 @@ body: JSON.stringify({ donationValue: parseFloat(donationValue) })
     alert('Erro ao realizar a doação. Tente novamente.');
 });
 }
+
+
+function extractBetweenHyphenAndDot(inputString) {
+// Encontra a posição do último '-' na string
+const hyphenIndex = inputString.lastIndexOf('-');
+// Encontra a posição do primeiro '.' após o '-'
+const dotIndex = inputString.indexOf('.', hyphenIndex);
+
+// Se ambos os índices forem válidos, extrai a substring
+if (hyphenIndex !== -1 && dotIndex !== -1) {
+return inputString.substring(hyphenIndex + 1, dotIndex);
+}
+
+// Retorna uma string vazia se não encontrar o padrão esperado
+return '';
+}
 function toggleComments(index) {
+    console.log("aaa"+index);
     const commentsSection = document.getElementById(`comments-section-${index}`);
     commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
-   // updateLocalStorage(email); 
+    updateLocalStorage(email); 
 }
 function sendmessagebutton(email) {
 // Obtenha o usuário atual do localStorage
@@ -429,13 +377,17 @@ body: JSON.stringify({
 updateLocalStorage(email); 
 }
 
-function likePhoto(index, email, usuario) {
+function likePhoto(index, email, usuario,index2, index22) {
+    console.log("indexoriginal"+index);
+    console.log("index"+index2);
+    console.log("email"+email);
+    console.log("usuario"+usuario);
 fetch('http://localhost:3000/update-curtidas', {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({
     email: email,
-    arteIndex: index,
+    arteIndex: index22,
     usuario: usuario, // Email do usuário atual
 }),
 })
@@ -454,6 +406,7 @@ body: JSON.stringify({
     alert(`Erro: ${error.message}`);
     console.error('Erro ao registrar curtida:', error);
 });
+
 updateLocalStorage(email); 
 }
 
@@ -569,10 +522,12 @@ body: JSON.stringify({
 }
 
 
-function addComment(index, email,originalIndex) {
+function addComment(index, email,originalIndex,index22) {
     const input = document.getElementById(`new-comment-input-${index}`);
     const commentText = input.value.trim();
-
+    console.log("aaaa");
+console.log(originalIndex);
+console.log(index);
     if (commentText === '') {
         alert("O comentário não pode estar vazio!");
         return;
@@ -596,7 +551,7 @@ function addComment(index, email,originalIndex) {
         },
         body: JSON.stringify({
             email: email,
-            arteIndex: originalIndex,
+            arteIndex: index22,
             comentario: {
                 usuario: "Você",
                 texto: commentText
@@ -607,7 +562,7 @@ function addComment(index, email,originalIndex) {
     .then(data => console.log("Comentário adicionado:", data))
     .catch(error => console.error('Erro ao adicionar comentário:', error));
     
-    updateLocalStorage(email); 
+   // updateLocalStorage(email); 
     
 }
 
@@ -631,7 +586,6 @@ if (file) {
         method: 'POST',
         body: formData,
     })
-   
         .then(response => response.json())
         .then(data => {
             // Enviar o caminho da nova arte para o backend
@@ -639,7 +593,7 @@ if (file) {
             fetch('http://localhost:3000/add-arte', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, arte: novaArte, name:"",curtidas:0,usuariosQueCurtiram:[] }),
+                body: JSON.stringify({ email: email, arte: novaArte }),
             })
                 .then(response => response.json())
                 .then(result => {
@@ -657,9 +611,11 @@ updateLocalStorage(email);
 }
 
 function openSettings() {
-window.location.href = 'pp.html'; // Substitua pelo caminho da sua página
+window.location.href = 'login.html';
+localStorage.clear();
+// Substitua pelo caminho da sua página
 }
 
 
 loadProfile(emailteste);
-loadArtes(emailteste);
+loadallArtes();
